@@ -1,23 +1,20 @@
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
 import cors from "cors";
 import UserRouter from "./routes/user";
 import mongoose from "mongoose";
+import { TaskRouter } from "./routes/tasks";
+import { Userauth } from "./auth/auth";
 
 
 const app = express();
-dotenv.config();
 app.use(express.json());
 app.use(cors());
 
 app.use("/api/v1/auth", UserRouter);
-
-app.get("/", (req, res) => {
-  console.log("hoi");
-  res.json({
-    message: "Fukc You",
-  });
-});
+app.use("/api/v1/tasks",Userauth, TaskRouter)
 
 const MongoUrl1 = process.env.MongoUrl!
 

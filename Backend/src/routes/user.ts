@@ -3,10 +3,10 @@ import { UserModel } from "../db/db";
 import { validateUserData } from "../zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Userauth } from "../auth/auth";
 const UserRouter = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET! || "rohan123";
-
+const JWT_SECRET = process.env.JWT_SECRET!;
 UserRouter.post("/signup", async (req: any, res: any) => {
   // Validation
   const parsed = validateUserData.safeParse(req.body);
@@ -20,7 +20,6 @@ UserRouter.post("/signup", async (req: any, res: any) => {
   const { username, email, password } = parsed.data;
 
   try {
-    
     const existing = await UserModel.findOne({ email });
     if (existing) {
       return res.status(409).json({ message: "Email already in use" });
@@ -73,5 +72,28 @@ UserRouter.post("/signin", async (req: any, res: any) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+UserRouter.post("/logout", Userauth, async (req, res) => {
+  res.status(200).json({
+    message: "logout successfully",
+  });
+});
+
+UserRouter.get("/profile", Userauth, async (req: any, res: any) => {
+  try {
+    const email = req.user.email;
+    const userDoc = await UserModel.findOne({ email }).select("-password");
+
+    if (!userDoc) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(userDoc);
+  } catch (error) {
+    console.error("Profile error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default UserRouter;

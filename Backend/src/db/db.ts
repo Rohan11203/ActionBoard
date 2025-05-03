@@ -11,8 +11,8 @@ const userSchema = new mongoose.Schema({
       message: { type: String },
       status: {
         type: String,
-        enum: ["pending", "accepted", "rejected"],
-        default: "pending",
+        enum: ["read", "unread"],
+        default: "unread",
       },
       createdAt: { type: Date, default: Date.now },
     },
