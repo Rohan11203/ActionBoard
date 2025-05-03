@@ -32,6 +32,7 @@ UserRouter.post("/signup", async (req: any, res: any) => {
 
     return res.status(201).json({
       success: true,
+      message: "Signup sucessfull",
       user: { id: user._id, username: user.username, email: user.email },
     });
   } catch (err) {
@@ -62,21 +63,36 @@ UserRouter.post("/signin", async (req: any, res: any) => {
     const payload = { sub: user._id.toString(), email: user.email };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
-    return res.json({
-      success: true,
-      token,
-      user: { id: user._id, username: user.username, email: user.email },
-    });
+    return res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: false, // Needed for HTTPS (Render uses HTTPS)
+      })
+      .json({
+        success: true,
+        message: "Login successful",
+        token,
+        user: { id: user._id, username: user.username, email: user.email },
+      });
   } catch (err) {
     console.error("Signin error:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 });
 
-UserRouter.post("/logout", Userauth, async (req, res) => {
-  res.status(200).json({
-    message: "logout successfully",
-  });
+UserRouter.post("/logout", Userauth, async (req:any, res:any) => {
+  try {
+    return res.status(200).clearCookie("token", { httpOnly: true }).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (err:any) {
+    console.log(err.message);
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
 });
 
 UserRouter.get("/profile", Userauth, async (req: any, res: any) => {
@@ -94,6 +110,5 @@ UserRouter.get("/profile", Userauth, async (req: any, res: any) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 export default UserRouter;

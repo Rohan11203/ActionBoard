@@ -195,9 +195,10 @@ export const listCreatedTasks = async (req: any, res: any, next: any) => {
 export const listOverdueTasks = async (req: any, res: any, next: any) => {
   try {
     const userId = new Types.ObjectId((req.user as any).sub);
+    console.log(userId)
     const now = new Date();
     const tasks = await TaskModel.find({
-      assignedTo: userId,
+      "assignedTo.user": userId,
       dueDate: { $lt: now },
       status: { $ne: "done" },
     }).lean();
