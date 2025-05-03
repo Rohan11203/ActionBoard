@@ -10,8 +10,9 @@ import { Userauth } from "./auth/auth";
 
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+
 
 app.use("/api/v1/auth", UserRouter);
 app.use("/api/v1/tasks",Userauth, TaskRouter)
