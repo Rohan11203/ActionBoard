@@ -4,8 +4,9 @@ import Sidebar from "../components/Sidebar";
 import Card from "../components/ui/Card";
 import TaskManagement from "../components/ActiveTask";
 import { Schedule } from "@mui/icons-material";
-import { ListAllTasks } from "../lib/api/page";
+import { CreateTask, ListAllTasks } from "../lib/api/page";
 import { useEffect, useState } from "react";
+import TaskFormModal from "../components/CreateTaskModal";
 
 export interface RawTask {
   _id: string;
@@ -24,14 +25,15 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<RawTask[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setshowModal] = useState(false);
 
   async function fetchTasks() {
     setLoading(true);
     setError(null);
 
     try {
-      const res = await ListAllTasks(); // axios response
-      setTasks(res.data as RawTask[]); // store into state
+      const res = await ListAllTasks();
+      setTasks(res.data as RawTask[]);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to load tasks");
@@ -64,11 +66,20 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <div className="flex justify-between items-center py-4 px-4">
+            <div className="flex relative justify-between items-center py-4 px-4">
+              {showModal && (
+                <TaskFormModal
+                  onClose={() => setshowModal(false)}
+                  onSubmit={async(data) => {
+                    console.log("Task submitted", data);
+                    await CreateTask(data)
+                  }}
+                />
+              )}
               <h1 className="text-2xl font-bold text-gray-800">Recent Tasks</h1>
               <button
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
-                onClick={() => console.log("Create new task")}
+                onClick={() => setshowModal(true)}
               >
                 <Plus size={18} />
                 <span>New</span>

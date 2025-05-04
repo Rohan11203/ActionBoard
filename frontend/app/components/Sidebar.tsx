@@ -3,7 +3,7 @@ const Sidebar = () => {
   return (
     <div className="w-20 bg-white border-r flex flex-col items-center py-6 space-y-8">
       <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold">
-        myT
+        R
       </div>
       <nav className="flex flex-col items-center space-y-6">
         <button className="size-lg text-gray-400">
@@ -28,11 +28,7 @@ const Sidebar = () => {
           <Clock className="h-6 w-6" />
         </button>
       </nav>
-      <div className="mt-auto">
-        <button className="size-lg rounded-full bg-purple-100 text-purple-700">
-          <PlusCircle className="h-6 w-6" />
-        </button>
-      </div>
+      
     </div>
   );
 };

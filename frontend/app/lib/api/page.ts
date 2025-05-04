@@ -33,3 +33,9 @@ export async function ListAllTasks(queryParams?: Record<string, any>) {
     params: queryParams,
   });
 }
+
+export async function CreateTask(data:any) {
+  return axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks`,data, 
+    {withCredentials: true}
+  )
+}
