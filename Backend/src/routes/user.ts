@@ -4,6 +4,7 @@ import { validateUserData } from "../zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Userauth } from "../auth/auth";
+import RandomAvtar from "../lib/randomAvtar";
 const UserRouter = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -28,7 +29,9 @@ UserRouter.post("/signup", async (req: any, res: any) => {
     const salt = await bcrypt.genSalt(12);
     const hash = await bcrypt.hash(password, salt);
 
-    const user = await UserModel.create({ username, email, password: hash });
+    const avtar = RandomAvtar();
+    console.log(avtar);
+    const user = await UserModel.create({ username, email, password: hash, avtar:avtar });
 
     return res.status(201).json({
       success: true,
@@ -63,11 +66,13 @@ UserRouter.post("/signin", async (req: any, res: any) => {
     const payload = { sub: user._id.toString(), email: user.email };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
+    console.log("here")
     return res
       .status(200)
       .cookie("token", token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false, // Needed for HTTPS (Render uses HTTPS)
+        sameSite: "lax",
       })
       .json({
         success: true,

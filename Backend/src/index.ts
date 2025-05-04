@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 import cors from "cors";
@@ -10,8 +11,14 @@ import { Userauth } from "./auth/auth";
 
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",  // your Next.js app
+    credentials: true,                // allow cookie headers
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
 
 app.use("/api/v1/auth", UserRouter);

@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
+  avtar: { type: String },
   notifications: [
     {
       taskId: { type: mongoose.Schema.Types.ObjectId, ref: "Task" },
