@@ -7,17 +7,46 @@ import { Schedule } from "@mui/icons-material";
 import { ListAllTasks } from "../lib/api/page";
 import { useEffect, useState } from "react";
 
+export interface RawTask {
+  _id: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  dueDate: string;
+  createdBy: string;
+  assignedTo: any[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function Dashboard() {
+  const [tasks, setTasks] = useState<RawTask[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [tasks, setTasks] = useState([]);
+  async function fetchTasks() {
+    setLoading(true);
+    setError(null);
 
-  async function FetchTasks(){
-    await ListAllTasks()
+    try {
+      const res = await ListAllTasks(); // axios response
+      setTasks(res.data as RawTask[]); // store into state
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to load tasks");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  useEffect(()=>{
-    FetchTasks();
-  },[])
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  if (loading) return <p className="text-center mt-10">Loading tasks…</p>;
+  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
+
   return (
     <div className="relative">
       <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
@@ -28,45 +57,11 @@ export default function Dashboard() {
         <div className="flex  gap-4  bg-slate-100 w-full m-4 p-4 rounded-lg">
           <div className="flex-2">
             <div className="flex justify-between">
-              <div className="p-4 bg-gray-100 max-w-xs">
-                <Card
-                  title="Project Alpha"
-                  description="This is a detailed description of the project which might span multiple lines in some cases."
-                  avatarUrls={[
-                    "https://i.pravatar.cc/150?img=1",
-                    "https://i.pravatar.cc/150?img=2",
-                    "https://i.pravatar.cc/150?img=3",
-                  ]}
-                  backgroundColor="bg-blue-50"
-                  onMenuClick={() => alert("Menu clicked")}
-                />
-              </div>
-              <div className="p-4 bg-gray-100 max-w-xs">
-                <Card
-                  title="Project Alpha"
-                  description="This is a detailed description of the project which might span multiple lines in some cases."
-                  avatarUrls={[
-                    "https://i.pravatar.cc/150?img=1",
-                    "https://i.pravatar.cc/150?img=2",
-                    "https://i.pravatar.cc/150?img=3",
-                  ]}
-                  backgroundColor="bg-blue-50"
-                  onMenuClick={() => alert("Menu clicked")}
-                />
-              </div>
-              <div className="p-4 bg-gray-100 max-w-xs">
-                <Card
-                  title="Project Alpha"
-                  description="This is a detailed description of the project which might span multiple lines in some cases."
-                  avatarUrls={[
-                    "https://i.pravatar.cc/150?img=1",
-                    "https://i.pravatar.cc/150?img=2",
-                    "https://i.pravatar.cc/150?img=3",
-                  ]}
-                  backgroundColor="bg-blue-50"
-                  onMenuClick={() => alert("Menu clicked")}
-                />
-              </div>
+              {tasks.slice(0, 3).map((task) => (
+                <div key={task._id} className="p-4 bg-gray-100 max-w-xs">
+                  <Card task={task} />
+                </div>
+              ))}
             </div>
 
             <div className="flex justify-between items-center py-4 px-4">
@@ -80,43 +75,23 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <TaskManagement />
+            <TaskManagement tasks={tasks} />
           </div>
 
           <div className="flex-1 p-4 border border-slate-200  shadow-lg rounded-xl">
             <div className="flex gap-2">
-                <div className="bg-blue-500 text-white p-1 rounded-lg text-center"><Schedule /></div>
-              <h1 className="font-semibold text-lg">UpComing Shedule</h1>
+              <div className="bg-red-500 text-white p-1 rounded-lg text-center">
+                <Schedule />
+              </div>
+              <h1 className="font-semibold text-lg">High Priority Tasks</h1>
             </div>
             <div className="p-4">
-              <Card
-                title="Project Alpha"
-                description="This is a detailed description of the project which might span multiple lines in some cases."
-                avatarUrls={[
-                  "https://i.pravatar.cc/150?img=1",
-                  "https://i.pravatar.cc/150?img=2",
-                  "https://i.pravatar.cc/150?img=3",
-                ]}
-                backgroundColor="bg-blue-50"
-                onMenuClick={() => alert("Menu clicked")}
-              />
+              {tasks
+                .filter((task) => task.priority === "high")
+                .map((task) => (
+                  <Card key={task._id} task={task} />
+                ))}
             </div>
-
-            <div className="p-4">
-              <Card
-                title="Project Alpha"
-                description="This is a detailed description of the project which might span multiple lines in some cases."
-                avatarUrls={[
-                  "https://i.pravatar.cc/150?img=1",
-                  "https://i.pravatar.cc/150?img=2",
-                  "https://i.pravatar.cc/150?img=3",
-                ]}
-                backgroundColor="bg-blue-50"
-                onMenuClick={() => alert("Menu clicked")}
-              />
-            </div>
-
-            
           </div>
         </div>
       </div>

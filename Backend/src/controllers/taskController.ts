@@ -56,7 +56,7 @@ export const listTasks: RequestHandler = async (
     if (dueDateBefore) filter.dueDate.$lte = new Date(dueDateBefore as string);
     if (dueDateAfter) filter.dueDate.$gte = new Date(dueDateAfter as string);
 
-    const tasks = await TaskModel.find(filter).sort({ dueDate: 1 }).lean();
+    const tasks = await TaskModel.find(filter).sort({ dueDate: 1 }).populate("assignedTo.user", "avtar username").lean();
     return res.status(200).json(tasks);
   } catch (err) {
     next(err);
