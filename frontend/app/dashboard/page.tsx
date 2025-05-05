@@ -1,5 +1,5 @@
 "use client";
-import { Plus, PlusCircle, PlusIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/ui/Card";
 import TaskManagement from "../components/ActiveTask";
@@ -25,12 +25,11 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<RawTask[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showModal, setshowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   async function fetchTasks() {
     setLoading(true);
     setError(null);
-
     try {
       const res = await ListAllTasks();
       setTasks(res.data as RawTask[]);
@@ -50,62 +49,66 @@ export default function Dashboard() {
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
   return (
-    <div className="relative">
-      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
-
-      <div className="flex min-h-screen ">
-        {/* Sidebar */}
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
         <Sidebar />
-        <div className="flex  gap-4  bg-slate-100 w-full m-4 p-4 rounded-lg">
-          <div className="flex-2">
-            <div className="flex justify-between">
-              {tasks.slice(0, 3).map((task) => (
-                <div key={task._id} className="p-4 bg-gray-100 max-w-xs">
-                  <Card task={task} />
-                </div>
-              ))}
-            </div>
 
-            <div className="flex relative justify-between items-center py-4 px-4">
-              {showModal && (
-                <TaskFormModal
-                  onClose={() => setshowModal(false)}
-                  onSubmit={async(data) => {
-                    console.log("Task submitted", data);
-                    await CreateTask(data)
-                  }}
-                />
-              )}
-              <h1 className="text-2xl font-bold text-gray-800">Recent Tasks</h1>
-              <button
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
-                onClick={() => setshowModal(true)}
-              >
-                <Plus size={18} />
-                <span>New</span>
-              </button>
-            </div>
-
-            <TaskManagement tasks={tasks} />
+      <main className="flex-1 flex flex-col p-4 md:p-6">
+        <section className="mb-6">
+          <h2 className="sr-only">Highlighted Tasks</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tasks.slice(0, 3).map((task) => (
+              <Card key={task._id} task={task} />
+            ))}
           </div>
+        </section>
 
-          <div className="flex-1 p-4 border border-slate-200  shadow-lg rounded-xl">
-            <div className="flex gap-2">
-              <div className="bg-red-500 text-white p-1 rounded-lg text-center">
-                <Schedule />
-              </div>
-              <h1 className="font-semibold text-lg">High Priority Tasks</h1>
-            </div>
-            <div className="p-4">
-              {tasks
-                .filter((task) => task.priority === "high")
-                .map((task) => (
-                  <Card key={task._id} task={task} />
-                ))}
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h1 className="text-2xl font-bold text-gray-800">Recent Tasks</h1>
+          <button
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
+            onClick={() => setShowModal(true)}
+          >
+            <Plus size={18} />
+            New
+          </button>
         </div>
-      </div>
+
+        {showModal && (
+          <TaskFormModal
+            onClose={() => setShowModal(false)}
+            onSubmit={async (data) => {
+              await CreateTask(data);
+              fetchTasks();
+            }}
+          />
+        )}
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Task Management (left) */}
+          <section className="flex-1">
+            <TaskManagement tasks={tasks} />
+          </section>
+
+          {/* High Priority Panel (right) */}
+          <aside className="w-full lg:w-1/3">
+            <div className="bg-white rounded-xl shadow p-4">
+              <div className="flex items-center mb-4">
+                <div className="bg-red-500 text-white p-2 rounded-md mr-2">
+                  <Schedule />
+                </div>
+                <h2 className="text-lg font-semibold">High Priority Tasks</h2>
+              </div>
+              <div className="space-y-3">
+                {tasks
+                  .filter((t) => t.priority === "high")
+                  .map((t) => (
+                    <Card key={t._id} task={t} />
+                  ))}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
     </div>
   );
 }
