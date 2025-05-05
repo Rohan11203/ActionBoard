@@ -1,7 +1,17 @@
+import { useRouter } from "next/navigation";
+
 export const TaskItem = ({ task,index }: any) => {
   
+  const router = useRouter()
+
+  function handleClick(){
+    router.push(`/taskdetails/${task._id}`);
+  }
+
   return (
-    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg mb-3 hover:shadow-md transition-shadow">
+    <div
+    onClick={handleClick}
+    className="flex items-center justify-between p-4 border border-blue-200 cursor-pointer rounded-lg mb-3 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-4">
         <div
           className={`bg-blue-400 w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold`}

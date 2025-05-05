@@ -1,100 +1,113 @@
-import React from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  ArrowLeft, 
-  Edit2, 
+"use client";
+import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import {
+  Calendar,
+  Clock,
+  ArrowLeft,
+  Edit2,
   Trash2,
   ChevronDown,
   UserPlus
 } from 'lucide-react';
+import { GetTask } from '../../lib/api/page';
 
-// Sample data based on the mongoose schema
-const task = {
-  _id: "t123456789",
-  title: "Redesign Marketing Dashboard",
-  description: "Create a new user interface for the marketing analytics dashboard. Focus on improving data visualization and user experience. Include components for campaign performance, audience demographics, and conversion metrics.",
-  status: "in-progress",
-  priority: "high",
-  dueDate: new Date("2025-05-15"),
-  createdBy: {
-    _id: "u100",
-    name: "Alex Morgan",
-    avatar: "/api/placeholder/40/40"
-  },
-  assignedTo: [
-    {
-      user: {
-        _id: "u101",
-        name: "Jamie Chen",
-        avatar: "/api/placeholder/40/40",
-        role: "UI Designer"
-      },
-      status: "accepted",
-      assignedAt: new Date("2025-05-01")
-    },
-    {
-      user: {
-        _id: "u102",
-        name: "Taylor Kim",
-        avatar: "/api/placeholder/40/40",
-        role: "Frontend Developer"
-      },
-      status: "accepted",
-      assignedAt: new Date("2025-05-01")
-    },
-    {
-      user: {
-        _id: "u103",
-        name: "Jordan Smith",
-        avatar: "/api/placeholder/40/40",
-        role: "Product Manager"
-      },
-      status: "pending",
-      assignedAt: new Date("2025-05-02")
-    }
-  ],
-  createdAt: new Date("2025-05-01"),
-  updatedAt: new Date("2025-05-03")
+// Define interfaces matching API response
+type User = {
+  _id: string;
+  username: string;
+  avtar: string;
+  role?: string;
 };
 
-// Helper functions
-const formatDate = (date:any) => {
-  return new Date(date).toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric' 
+type Assignment = {
+  user: User;
+  status: string;
+  assignedAt: string;
+};
+
+export interface RawTask {
+  _id: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  dueDate: string;
+  createdBy: User;
+  assignedTo: Assignment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+const formatDate = (date: string) =>
+  new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
   });
-};
 
-const formatDateTime = (date:any) => {
-  return new Date(date).toLocaleString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
-    hour: '2-digit', 
+const formatDateTime = (date: string) =>
+  new Date(date).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
     minute: '2-digit'
   });
-};
 
-const priorityClasses = {
-  low: 'bg-blue-100 text-blue-800',
-  medium: 'bg-yellow-100 text-yellow-800',
-  high: 'bg-red-100 text-red-800'
-};
-
-const statusClasses = {
+const statusClasses: Record<string, string> = {
   'to-do': 'bg-gray-100 text-gray-800',
   'in-progress': 'bg-purple-100 text-purple-800',
-  'completed': 'bg-green-100 text-green-800'
+  completed: 'bg-green-100 text-green-800'
 };
 
-const assignedStatusClasses = {
+const assignedStatusClasses: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   accepted: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800'
 };
 
 const TaskDetailView = () => {
+  const params = useParams();
+  const taskId = params?.taskId;
+  const router = useRouter();
+
+  const [task, setTask] = useState<RawTask | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!taskId) return;
+
+    const fetchTask = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await GetTask(taskId);
+        setTask(res.data as RawTask);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message || 'Failed to load task');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTask();
+  }, [taskId]);
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading task...</div>;
+  }
+
+  if (error || !task) {
+    return (
+      <div className="p-8 text-center text-red-600">
+        {error || 'Task not found.'}
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Header */}
@@ -102,7 +115,10 @@ const TaskDetailView = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <button className="mr-4 p-2 rounded-full hover:bg-gray-100">
+              <button
+                onClick={() => router.back()}
+                className="mr-4 p-2 rounded-full hover:bg-gray-100"
+              >
                 <ArrowLeft size={20} />
               </button>
               <h1 className="text-xl font-bold text-gray-900">Task Details</h1>
@@ -124,21 +140,19 @@ const TaskDetailView = () => {
       {/* Main content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Task information (2/3 width on large screens) */}
+          {/* Task info */}
           <div className="lg:col-span-2">
-            {/* Task header */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex flex-wrap gap-3 mb-4">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusClasses["in-progress"]}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${statusClasses[task.status]}`}
+                >
                   {task.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </span>
-                {/* <span className={`px-3 py-1 rounded-full text-sm font-medium ${priorityClasses[task.priority]}`}> */}
-                  {/* {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority */}
-                {/* </span> */}
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-3">{task.title}</h2>
               <p className="text-gray-700 whitespace-pre-line mb-6">{task.description}</p>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
                   <Calendar size={16} className="text-gray-400" />
@@ -153,19 +167,25 @@ const TaskDetailView = () => {
               </div>
             </div>
           </div>
-          
-          {/* Sidebar (1/3 width on large screens) */}
+
+          {/* Sidebar */}
           <div className="space-y-6">
             {/* Created by */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4">Created by</h3>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                  <img src={task.createdBy.avatar} alt={task.createdBy.name} className="w-full h-full object-cover" />
+                  <img
+                    src={task.createdBy.avtar}
+                    alt={task.createdBy.username}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
-                  <p className="font-medium">{task.createdBy.name}</p>
-                  <p className="text-sm text-gray-500">Created {formatDate(task.createdAt)}</p>
+                  <p className="font-medium">{task.createdBy.username}</p>
+                  <p className="text-sm text-gray-500">
+                    Created {formatDate(task.createdAt)}
+                  </p>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100">
@@ -175,7 +195,7 @@ const TaskDetailView = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Assigned to */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
@@ -185,28 +205,33 @@ const TaskDetailView = () => {
                   <span>Assign</span>
                 </button>
               </div>
-              
               <div className="space-y-4">
-                {task.assignedTo.map((assignment, index) => (
-                  <div key={index} className="flex items-center justify-between">
+                {task.assignedTo.map((a, i) => (
+                  <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                        <img src={assignment.user.avatar} alt={assignment.user.name} className="w-full h-full object-cover" />
+                        <img
+                          src={a.user.avtar}
+                          alt={a.user.username}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div>
-                        <p className="font-medium">{assignment.user.name}</p>
-                        <p className="text-xs text-gray-500">{assignment.user.role}</p>
+                        <p className="font-medium">{a.user.username}</p>
+                        {a.user.role && <p className="text-xs text-gray-500">{a.user.role}</p>}
                       </div>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${assignedStatusClasses["accepted"]}`}>
-                      {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${assignedStatusClasses[a.status]}`}
+                    >
+                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
                     </span>
                   </div>
                 ))}
               </div>
             </div>
-            
-            {/* Timeline / Activity */}
+
+            {/* Activity */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Activity</h3>
@@ -214,26 +239,27 @@ const TaskDetailView = () => {
                   <ChevronDown size={18} />
                 </button>
               </div>
-              
               <div className="space-y-4">
+                {task.assignedTo[0] && (
+                  <div className="relative pl-6 pb-4 border-l border-gray-200">
+                    <div className="absolute -left-1.5 mt-1 w-3 h-3 bg-purple-500 rounded-full" />
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">{task.assignedTo[0].user.username}</span> accepted the task
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatDateTime(task.assignedTo[0].assignedAt)}
+                    </p>
+                  </div>
+                )}
                 <div className="relative pl-6 pb-4 border-l border-gray-200">
-                  <div className="absolute -left-1.5 mt-1 w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <div className="absolute -left-1.5 mt-1 w-3 h-3 bg-blue-500 rounded-full" />
                   <p className="text-sm text-gray-700">
-                    <span className="font-medium">Jamie Chen</span> accepted the task
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{formatDateTime(task.assignedTo[0].assignedAt)}</p>
-                </div>
-                
-                <div className="relative pl-6 pb-4 border-l border-gray-200">
-                  <div className="absolute -left-1.5 mt-1 w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Alex Morgan</span> created the task
+                    <span className="font-medium">{task.createdBy.username}</span> created the task
                   </p>
                   <p className="text-xs text-gray-500 mt-1">{formatDateTime(task.createdAt)}</p>
                 </div>
-                
                 <div className="relative pl-6">
-                  <div className="absolute -left-1.5 mt-1 w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="absolute -left-1.5 mt-1 w-3 h-3 bg-green-500 rounded-full" />
                   <p className="text-sm text-gray-700">
                     <span className="font-medium">System</span> set the due date to {formatDate(task.dueDate)}
                   </p>

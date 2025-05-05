@@ -56,7 +56,10 @@ export const listTasks: RequestHandler = async (
     if (dueDateBefore) filter.dueDate.$lte = new Date(dueDateBefore as string);
     if (dueDateAfter) filter.dueDate.$gte = new Date(dueDateAfter as string);
 
-    const tasks = await TaskModel.find(filter).sort({ dueDate: 1 }).populate("assignedTo.user", "avtar username").lean();
+    const tasks = await TaskModel.find(filter)
+      .sort({ dueDate: 1 })
+      .populate("assignedTo.user", "avtar username")
+      .lean();
     return res.status(200).json(tasks);
   } catch (err) {
     next(err);
@@ -70,8 +73,18 @@ export const getTask = async (req: any, res: any, next: any) => {
     if (!Types.ObjectId.isValid(taskId)) {
       return res.status(400).json({ message: "Invalid task ID" });
     }
+    const task = await TaskModel.findById(taskId)
+      .populate({
+        path: "assignedTo.user",
+        select: "avtar username role", // fields you actually have on your User schema
+      })
+      .populate({
+        path: "createdBy",
+        select: "avtar username", // again, pick the real field names
+      })
+      .lean();
 
-    const task = await TaskModel.findById(taskId).lean();
+
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
@@ -119,9 +132,6 @@ export const assignTask = async (req: any, res: any, next: any) => {
     const { taskId } = req.params;
     const { assigneeIds } = req.body as { assigneeIds: string[] };
 
-    console.log(taskId);
-    console.log(assigneeIds);
-    // Validate task
     const task = await TaskModel.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
@@ -195,7 +205,7 @@ export const listCreatedTasks = async (req: any, res: any, next: any) => {
 export const listOverdueTasks = async (req: any, res: any, next: any) => {
   try {
     const userId = new Types.ObjectId((req.user as any).sub);
-    console.log(userId)
+    console.log(userId);
     const now = new Date();
     const tasks = await TaskModel.find({
       "assignedTo.user": userId,
