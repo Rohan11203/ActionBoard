@@ -14,7 +14,7 @@ export default function Card({
   return (
     <div
     onClick={handleClick}
-    className={`bg-blue-100 rounded-xl cursor-pointer shadow-md p-4 flex flex-col gap-3 m-4`}>
+    className={`bg-blue-100  rounded-xl cursor-pointer shadow-md p-4 flex flex-col gap-3 m-4`}>
       <h2 className="font-semibold truncate">{task.title}</h2>
       <p className="text-gray-600 text-sm line-clamp-2">{task.description}</p>
 

@@ -11,15 +11,23 @@ import {
   LogOut,
 } from "lucide-react";
 
-const Sidebar = () => {
-  const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState("home");
+interface SidebarProps {
+  username:string;
+  email:string;
+  activeItem: string;
+  setActiveItem: (item: string) => void;
+  open: boolean;
+  setOpen: (val: boolean) => void;
+}
+
+const Sidebar:React.FC<SidebarProps> = ({ username,email
+  ,activeItem, setActiveItem, open, setOpen, }) => {
 
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "search", label: "Search", icon: Search },
-    { id: "analytics", label: "Analytics", icon: BarChart },
-    { id: "profile", label: "Profile", icon: User },
+    { id: "myTasks", label: "MyTasks", icon: BarChart },
+    { id: "assignedTasks", label: "Assigned Tasks", icon: User },
   ];
 
   return (
@@ -37,7 +45,7 @@ const Sidebar = () => {
 
       {open && (
         <div
-          className="fixed inset-0 bg-black  z-40  transition-opacity"
+          className="fixed inset-0   z-40  transition-opacity"
           onClick={() => setOpen(false)}
         />
       )}
@@ -53,10 +61,12 @@ const Sidebar = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                R
+                {
+                  username.charAt(0).toUpperCase()
+                }
               </div>
               <span className="text-xl font-semibold text-gray-800">
-                Radial
+                {username}
               </span>
             </div>
             <button
@@ -106,8 +116,8 @@ const Sidebar = () => {
               <User className="h-6 w-6 text-gray-600" />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-gray-800">User Name</p>
-              <p className="text-xs text-gray-500">user@example.com</p>
+              <p className="font-medium text-gray-800">{username}</p>
+              <p className="text-xs text-gray-500">{email}</p>
             </div>
             <button className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 transition-colors">
               <LogOut className="h-4 w-4" />
@@ -115,6 +125,7 @@ const Sidebar = () => {
           </div>
         </div>
       </aside>
+
     </>
   );
 };

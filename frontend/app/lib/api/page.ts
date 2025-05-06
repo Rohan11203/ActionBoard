@@ -32,8 +32,17 @@ export async function onSignIn(loginData: loginData) {
   );
 }
 
+export async function GetProfile() {
+  return await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`)
+}
 
+export async function listCreatedTasks() {
+  return axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks/dashboard/created`)
+}
 
+export async function listAssignedTasks() {
+  return await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks/dashboard/assigned`)
+}
 // List all tasks using Search & filter in query params
 export async function ListAllTasks(filters: TaskFilters = {}) {
   return axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks`, 

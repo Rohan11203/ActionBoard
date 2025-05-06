@@ -50,8 +50,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-        <Sidebar />
-
       <main className="flex-1 flex flex-col p-4 md:p-6">
         <section className="mb-6">
           <h2 className="sr-only">Highlighted Tasks</h2>

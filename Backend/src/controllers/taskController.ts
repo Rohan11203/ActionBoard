@@ -178,8 +178,14 @@ export const listAssignedTasks = async (req: any, res: any, next: any) => {
   try {
     const userId = new Types.ObjectId((req.user as any).sub);
     const user = await UserModel.findById(userId)
-      .populate("assignedTasks") // this populates with full task documents
-      .lean();
+    .populate({
+      path: "assignedTasks",
+      populate: {
+        path: "assignedTo.user", // nested population
+        model: "User",
+        select: "username avtar", // only get needed fields
+      },
+    }).lean();
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -194,7 +200,10 @@ export const listAssignedTasks = async (req: any, res: any, next: any) => {
 export const listCreatedTasks = async (req: any, res: any, next: any) => {
   try {
     const userId = (req.user as any).sub;
-    const tasks = await TaskModel.find({ createdBy: userId }).lean();
+    const tasks = await TaskModel.find({ createdBy: userId }).populate({
+      path: "assignedTo.user",
+      select: "avtar username"
+    }).lean();
     return res.status(200).json(tasks);
   } catch (err) {
     next(err);
