@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { TaskModel } from "../db/db"; // adjust path as needed
 import { UserModel } from "../db/db";
 import { JwtPayload } from "jsonwebtoken";
@@ -15,8 +15,14 @@ export const createTask: RequestHandler = async (
   next: any
 ) => {
   try {
-    const { title, description, dueDate, priority, status } = req.body;
+    const { title, description, dueDate, priority, status,assignedTo } = req.body;
     const createdBy = (req.user as any).sub;
+
+    const assignedToIds = assignedTo.map((id:any) => ({
+      user: new mongoose.Types.ObjectId(id),
+      status: "pending",
+      assignedAt: new Date(),
+    }));
 
     const task = await TaskModel.create({
       title,
@@ -25,7 +31,7 @@ export const createTask: RequestHandler = async (
       priority,
       status,
       createdBy,
-      assignedTo: [],
+      assignedTo: assignedToIds,
     });
 
     return res.status(201).json(task);
@@ -100,6 +106,15 @@ export const updateTask = async (req: any, res: any, next: any) => {
     const { taskId } = req.params;
     const updates = req.body;
 
+    if (updates.assignedTo && Array.isArray(updates.assignedTo)) {
+      updates.assignedTo = updates.assignedTo.map((id: string) => ({
+        user: new mongoose.Types.ObjectId(id),
+        status: "pending",
+        assignedAt: new Date(),
+      }));
+    }
+    
+    console.log(updates)
     const task = await TaskModel.findByIdAndUpdate(taskId, updates, {
       new: true,
     }).lean();

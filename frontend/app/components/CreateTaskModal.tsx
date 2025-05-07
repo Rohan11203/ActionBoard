@@ -1,34 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { X, Calendar, CheckCircle, Flag, AlignLeft, Users } from "lucide-react";
+import AssignUser from "./AssignUser";
 
 interface TaskFormModalProps {
   onClose: () => void;
   onSubmit: (data: any) => void;
   isEdit?: boolean;
   initialData?: any;
+  title?:string;
+  description?:string;
 }
 
 export default function TaskFormModal({
+  title,
+  description,
   onClose,
   onSubmit,
   isEdit = false,
   initialData,
 }: TaskFormModalProps) {
+  const [selectedUserId, setSelectedUserId] = useState<string[]>([]);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     status: "pending",
     priority: "medium",
     dueDate: "",
-    assignedTo: [],
+    assignedTo: [] as string[],
     ...initialData,
   });
 
+  useEffect(() => {
+    setFormData((prev:any) => ({
+      ...prev,
+      assignedTo: selectedUserId,
+      title: title || prev.title,
+    description: description || prev.description,
+    }));
+  }, [title,description,selectedUserId]);
+
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev:any) => ({ ...prev, [name]: value }));
+    setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.MouseEvent) => {
@@ -53,14 +72,14 @@ export default function TaskFormModal({
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    
+
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50  bg-opacity-50 backdrop-blur-sm p-2 sm:p-4">
-      <div 
+      <div
         className="bg-white rounded-lg w-full max-h-[90vh] overflow-y-auto max-w-sm sm:max-w-md md:max-w-lg shadow-xl border border-gray-200"
         onClick={(e) => e.stopPropagation()}
       >
@@ -69,7 +88,7 @@ export default function TaskFormModal({
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
             {isEdit ? "Edit Task" : "Create New Task"}
           </h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
@@ -80,7 +99,10 @@ export default function TaskFormModal({
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* Title */}
           <div className="space-y-2">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700"
+            >
               Title <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -102,7 +124,10 @@ export default function TaskFormModal({
 
           {/* Description */}
           <div className="space-y-2">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
               Description
             </label>
             <div className="relative">
@@ -123,7 +148,10 @@ export default function TaskFormModal({
           {/* Status and Priority */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Status
               </label>
               <div className="relative">
@@ -144,15 +172,28 @@ export default function TaskFormModal({
                   <CheckCircle className=" h-5 w-5" />
                 </div>
                 <div className="absolute right-3 top-3.5 pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="priority"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Priority
               </label>
               <div className="relative">
@@ -162,7 +203,9 @@ export default function TaskFormModal({
                   value={formData.priority}
                   onChange={handleChange}
                   className={`w-full p-3 border rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-10 pr-10 ${
-                    priorityColors[formData.priority as keyof typeof priorityColors]
+                    priorityColors[
+                      formData.priority as keyof typeof priorityColors
+                    ]
                   }`}
                 >
                   <option value="low">Low</option>
@@ -173,8 +216,18 @@ export default function TaskFormModal({
                   <Flag className="h-5 w-5" />
                 </div>
                 <div className="absolute right-3 top-3.5 pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -183,7 +236,10 @@ export default function TaskFormModal({
 
           {/* Due Date */}
           <div className="space-y-2">
-            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="dueDate"
+              className="block text-sm font-medium text-gray-700"
+            >
               Due Date
             </label>
             <div className="relative">
@@ -202,7 +258,7 @@ export default function TaskFormModal({
           </div>
 
           {/* Assigned To -  implementation Remaining */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Assigned To
             </label>
@@ -214,10 +270,11 @@ export default function TaskFormModal({
                 <Users className="h-5 w-5" />
               </div>
             </div>
-          </div>
+          </div> */}
+
+          <AssignUser selectedUserId={selectedUserId} setSelectedUserId={setSelectedUserId} />
         </div>
 
-       
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:justify-end gap-2 sm:gap-3 bg-gray-50 sticky bottom-0">
           <button
             type="button"

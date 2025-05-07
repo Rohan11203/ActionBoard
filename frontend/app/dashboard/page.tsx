@@ -1,6 +1,5 @@
 "use client";
 import { Plus } from "lucide-react";
-import Sidebar from "../components/Sidebar";
 import Card from "../components/ui/Card";
 import TaskManagement from "../components/ActiveTask";
 import { Schedule } from "@mui/icons-material";
@@ -28,6 +27,8 @@ export default function Dashboard() {
   const [showModal, setShowModal] = useState(false);
 
   async function fetchTasks() {
+
+
     setLoading(true);
     setError(null);
     try {

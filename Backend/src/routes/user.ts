@@ -8,6 +8,32 @@ import RandomAvtar from "../lib/randomAvtar";
 const UserRouter = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
+
+UserRouter.get("/search",Userauth, async (req:any,res:any) => {
+  try{
+    const keyword = req.query.search
+  ?
+  {
+    $or: [
+      { username: { $regex:req.query.search, $options: "i" } },
+      { email: { $regex:req.query.search, $options: "i" } }
+    ]
+  }:{}
+
+  console.log(keyword);
+
+  const users = await UserModel.find(keyword).find({ _id:{ $ne: req.user._id } })   
+  res.status(200).json(users);
+
+  }
+  catch(e){
+    res.json({
+      message: "Error while fetching user from search"
+    })
+  }
+
+})
+
 UserRouter.post("/signup", async (req: any, res: any) => {
   // Validation
   const parsed = validateUserData.safeParse(req.body);

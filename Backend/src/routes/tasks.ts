@@ -7,7 +7,7 @@ TaskRouter.post("/", createTask);
 TaskRouter.get("/", listTasks);
 TaskRouter.get("/:taskId", getTask);
 TaskRouter.put("/:taskId",updateTask);
-TaskRouter.delete("/taskId", deleteTask);
+TaskRouter.delete("/:taskId", deleteTask);
 TaskRouter.post("/:taskId/assign", assignTask)
 
 // DasHbord

@@ -38,7 +38,7 @@ const MyTasksPage = () => {
       ) : (
         <ul className="space-y-4">
           {tasks.map((task) => (
-            <Card task={task} />
+            <Card key={task._id} task={task} />
           ))}
         </ul>
       )}
