@@ -44,21 +44,26 @@ npm start
 ```
 `` 
 ### 🔧 Frontend Setup
-cd frontend
-npm install
 
 Set up .env.local
 NEXT_PUBLIC_API_BASE_URL=https://your-backend-url.com
 
+```bash
+cd frontend
+npm install
+```
+
+```bash
 Start development:
 npm run dev
+```
 
+```bash
 For production:
 npm run build
 npm start
 ```
 
-```
 
 💡 Approach Explanation
 Authentication: JWT in secure cookies; token is validated via middleware.
@@ -68,5 +73,5 @@ Task Assignment: Tasks include an assignedTo field with user reference.
 Role Control: Basic – only assigned users or task creators can modify tasks.
 
 Frontend & API: Axios used to communicate securely between frontend and backend.
-```
+
 
