@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { onSignUp } from "@/app/lib/api/page";
+import { onSignUp } from "@/app/lib/api/route";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {

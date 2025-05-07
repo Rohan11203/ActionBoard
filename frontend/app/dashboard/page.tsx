@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import Card from "../components/ui/Card";
 import TaskManagement from "../components/ActiveTask";
 import { Schedule } from "@mui/icons-material";
-import { CreateTask, ListAllTasks } from "../lib/api/page";
+import { CreateTask, ListAllTasks } from "../lib/api/route";
 import { useEffect, useState } from "react";
 import TaskFormModal from "../components/CreateTaskModal";
 
