@@ -36,6 +36,7 @@ const AssignUser = ({selectedUserId,setSelectedUserId}:any) => {
   }
   return (
     <div className="">
+      <h2 className="p-2 font-semibold text-slate-600">Assign Users</h2>
       <div className="flex justify-between">
         <input
           placeholder="Search User"

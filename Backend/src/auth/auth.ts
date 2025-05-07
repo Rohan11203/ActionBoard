@@ -9,7 +9,7 @@ export function Userauth(req: any, res: any, next: NextFunction) {
 
   const token = req.cookies.token;
   if (!token) {
-    return res.status(401).json({ message: "Missing token" });
+    return res.status(401).json({ message: "Please SignIn First" });
   }
   jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
     if (err) {

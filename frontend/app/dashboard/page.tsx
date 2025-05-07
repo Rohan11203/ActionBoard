@@ -35,8 +35,7 @@ export default function Dashboard() {
       const res = await ListAllTasks();
       setTasks(res.data as RawTask[]);
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Failed to load tasks");
+      setError(err.response.data.message || "Failed to load tasks");
     } finally {
       setLoading(false);
     }
