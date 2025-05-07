@@ -13,7 +13,7 @@ import { Userauth } from "./auth/auth";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",  // your Next.js app
+    origin: ["http://localhost:3000","https://actionboard-o9g9.onrender.com"],  // your Next.js app
     credentials: true,                // allow cookie headers
   })
 );
