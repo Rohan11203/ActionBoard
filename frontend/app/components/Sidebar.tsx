@@ -10,6 +10,8 @@ import {
   Home,
   LogOut,
 } from "lucide-react";
+import { OnLogout } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   username:string;
@@ -29,6 +31,13 @@ const Sidebar:React.FC<SidebarProps> = ({ username,email
     { id: "myTasks", label: "MyTasks", icon: BarChart },
     { id: "assignedTasks", label: "Assigned Tasks", icon: User },
   ];
+
+  const router = useRouter()
+
+  async function handleLogout(){
+    await OnLogout();
+    router.push("/auth/login")
+  }
 
   return (
     <>
@@ -119,7 +128,9 @@ const Sidebar:React.FC<SidebarProps> = ({ username,email
               <p className="font-medium text-gray-800">{username}</p>
               <p className="text-xs text-gray-500">{email}</p>
             </div>
-            <button className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 transition-colors">
+            <button 
+            onClick={handleLogout}
+            className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 transition-colors cursor-pointer">
               <LogOut className="h-4 w-4" />
             </button>
           </div>

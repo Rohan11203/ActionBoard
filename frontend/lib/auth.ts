@@ -86,3 +86,7 @@ export async function UpdateTask(taskId:any,data:any) {
 export async function DeleteTask(taskId?: any) {
   return axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks/${taskId}`);
 }
+
+export async function OnLogout() {
+    return axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`)
+}
