@@ -1,5 +1,5 @@
 "use client";
-import { onSignIn } from "@/app/lib/api/route";
+import { onSignIn } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

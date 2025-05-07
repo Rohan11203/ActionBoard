@@ -35,7 +35,9 @@ export async function onSignIn(loginData: loginData) {
 }
 
 export async function GetProfile() {
-  return await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`);
+  return await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`,{
+    withCredentials:true
+  });
 }
 
 export async function listCreatedTasks() {
@@ -53,6 +55,7 @@ export async function listAssignedTasks() {
 export async function ListAllTasks(filters: TaskFilters = {}) {
   return axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks`, {
     params: filters,
+    withCredentials:true
   });
 }
 

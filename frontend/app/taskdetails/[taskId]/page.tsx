@@ -10,7 +10,7 @@ import {
   ChevronDown,
   UserPlus,
 } from "lucide-react";
-import { GetTask,UpdateTask } from "../../lib/api/route";
+import { GetTask,UpdateTask } from "@/lib/auth";
 import TaskFormModal from "@/app/components/CreateTaskModal";
 import DeleteModal from "@/app/components/ui/DeleteModal";
 

@@ -96,9 +96,9 @@ UserRouter.post("/signin", async (req: any, res: any) => {
     return res
       .status(200)
       .cookie("token", token, {
-        httpOnly: false,
-        secure: false, // Needed for HTTPS (Render uses HTTPS)
-        sameSite: "lax",
+        httpOnly: true,
+        secure: true, // Needed for HTTPS (Render uses HTTPS)
+        sameSite: "none",
       })
       .json({
         success: true,

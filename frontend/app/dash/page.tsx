@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Dashboard from "../dashboard/page";
 import SearchPage from "../search/page";
-import { GetProfile } from "../lib/api/route";
+import { GetProfile } from "@/lib/auth";
 import MyTasksPage from "../components/MyTasks";
 import AssignedTasks from "../components/AssignedTasks";
 export interface Notification {

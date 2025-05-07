@@ -1,5 +1,5 @@
 "use client"
-import { DeleteTask } from '@/app/lib/api/route'
+import { DeleteTask } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 

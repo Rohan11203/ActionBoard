@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import {  listAssignedTasks } from "../lib/api/route";
+import {  listAssignedTasks } from "@/lib/auth";
 import { RawTask } from "../dashboard/page";
 import Card from "./ui/Card";
 

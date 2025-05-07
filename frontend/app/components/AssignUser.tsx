@@ -1,6 +1,6 @@
 import React, { use, useState } from "react";
 import UserListItem from "./ui/UserListItem";
-import { SearchUsers } from "../lib/api/route";
+import { SearchUsers } from "@/lib/auth";
 
 interface User {
   _id: string;
