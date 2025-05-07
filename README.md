@@ -70,8 +70,6 @@ Authentication: JWT in secure cookies; token is validated via middleware.
 
 Task Assignment: Tasks include an assignedTo field with user reference.
 
-Role Control: Basic – only assigned users or task creators can modify tasks.
-
 Frontend & API: Axios used to communicate securely between frontend and backend.
 
 
